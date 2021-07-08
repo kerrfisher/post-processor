@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace PostProcessor.Models
 {
-    public class LinearRegression
+    public class LinearData
     {
         public double Slope { get; set; }
         public double StdDev { get; set; }
         public string XY { get; set; }
 
-        public LinearRegression(double slope, double stdDev, string xy)
+        public LinearData(double slope, double stdDev, string xy)
         {
             Slope = slope;
             StdDev = stdDev;

@@ -18,8 +18,8 @@ namespace PostProcessor.ViewModels
 
         private static ObservableCollection<MotionsData> GetMotionsData()
         {
-            MotionsData row1 = new MotionsData(new LinearRegression(0.2, 0.4, "7.8,9"), new LinearRegression(0.3, 0.8, "3.9,4.5"));
-            MotionsData row2 = new MotionsData(new LinearRegression(1.2, 1.4, "17.8,19"), new LinearRegression(1.3, 1.8, "13.9,14.5"));
+            MotionsData row1 = new MotionsData(new LinearData(0.2, 0.4, "7.8,9"), new LinearData(0.3, 0.8, "3.9,4.5"));
+            MotionsData row2 = new MotionsData(new LinearData(1.2, 1.4, "17.8,19"), new LinearData(1.3, 1.8, "13.9,14.5"));
 
             ObservableCollection<MotionsData> motionsData = new ObservableCollection<MotionsData>();
             motionsData.Add(row1);

@@ -8,10 +8,10 @@ namespace PostProcessor.Models
 {
     public class MotionsData
     {
-        public LinearRegression Heel { get; set; }
-        public LinearRegression Pitch { get; set; }
+        public LinearData Heel { get; set; }
+        public LinearData Pitch { get; set; }
 
-        public MotionsData(LinearRegression heel, LinearRegression pitch)
+        public MotionsData(LinearData heel, LinearData pitch)
         {
             Heel = heel;
             Pitch = pitch;
