@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PostProcessor.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,18 @@ namespace PostProcessor
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            MainViewModel mainViewModel = new MainViewModel();
+
+            MainWindow mainWindow = new MainWindow(mainViewModel)
+            {
+                DataContext = mainViewModel
+            };
+
+            mainWindow.Show();
+
+            base.OnStartup(e);
+        }
     }
 }

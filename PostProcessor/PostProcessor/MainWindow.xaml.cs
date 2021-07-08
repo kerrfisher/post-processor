@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using PostProcessor.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,40 @@ namespace PostProcessor
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private MainViewModel mainViewModel;
+
+        public MainWindow(MainViewModel mainViewModel)
         {
             InitializeComponent();
+
+            this.mainViewModel = mainViewModel;
+
+            dataGrid3.DataContext = mainViewModel.TankData;
+            dataGrid1.DataContext = mainViewModel.MotionsData;
+        }
+
+        private void OpenFileClick(object sender, RoutedEventArgs e)
+        {
+            // Create open file dialog
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.FileName = "Document"; // Default file name
+            dlg.DefaultExt = ".txt"; // Default file extension
+            dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
+
+            // Show open file dialog box
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Set filename label
+                Uri filepathUri = new Uri(dlg.FileName);
+                if (filepathUri.IsFile)
+                {
+                    lblFilename.Content = System.IO.Path.GetFileName(filepathUri.LocalPath);
+                    mainViewModel.ReadFileContents(dlg.FileName);
+                }
+            }
         }
     }
 }
