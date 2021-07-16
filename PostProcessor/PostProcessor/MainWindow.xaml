@@ -40,26 +40,32 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <DataGrid x:Name="dataGrid1" ItemsSource="{Binding}" Grid.Column="0" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid x:Name="dataGrid1" ItemsSource="{Binding}" Margin="10" Grid.Column="0" Grid.Row="1" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Shift no."/>
-                            <DataGridTextColumn Header="Slope" Binding="{Binding Heel.Slope}"/>
-                            <DataGridTextColumn Header="StdDev" Binding="{Binding Heel.StdDev}"/>
-                            <DataGridTextColumn Header="x,y" Binding="{Binding Heel.XY}"/>
-                            <DataGridTextColumn Header="Slope" Binding="{Binding Pitch.Slope}"/>
-                            <DataGridTextColumn Header="StdDev" Binding="{Binding Pitch.StdDev}"/>
-                            <DataGridTextColumn Header="x,y" Binding="{Binding Pitch.XY}"/>
+                            <DataGridTextColumn Header="H Slope" Binding="{Binding Heel.Slope}"/>
+                            <DataGridTextColumn Header="H StdDev" Binding="{Binding Heel.StdDev}"/>
+                            <DataGridTextColumn Header="H x,y" Binding="{Binding Heel.XY}"/>
+                            <DataGridTextColumn Header="P Slope" Binding="{Binding Pitch.Slope}"/>
+                            <DataGridTextColumn Header="P StdDev" Binding="{Binding Pitch.StdDev}"/>
+                            <DataGridTextColumn Header="P x,y" Binding="{Binding Pitch.XY}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <DataGrid x:Name="dataGrid2" Grid.Column="1" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
+                    
+                    <DataGrid x:Name="dataGrid2" ItemsSource="{Binding}" Grid.Column="1" Grid.Row="1" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Shift no."/>
-                            <DataGridTextColumn Header="Trans" Binding="{Binding Transversal}"/>
-                            <DataGridTextColumn Header="Long" Binding="{Binding Longitudinal}"/>
-                            <DataGridTextColumn Header="Avg H" Binding="{Binding HeelAvg}"/>
-                            <DataGridTextColumn Header="Avg T" Binding="{Binding TrimAvg}"/>
+                            <DataGridTextColumn Header="Trans" Binding="{Binding TransversalMoment}"/>
+                            <DataGridTextColumn Header="Long" Binding="{Binding LongitudinalMoment}"/>
+                            <DataGridTextColumn Header="Avg H" Binding="{Binding AverageHeel}"/>
+                            <DataGridTextColumn Header="Avg T" Binding="{Binding AverageTrim}"/>
                             <DataGridTextColumn Header="Drft" Binding="{Binding Draught}"/>
-                            <DataGridTextColumn Header="Displ" Binding="{Binding Displacement}"/>
+                            <DataGridTextColumn Header="Displ" Binding="{Binding CorrespondingDisplacement}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

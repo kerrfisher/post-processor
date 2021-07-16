@@ -15,6 +15,15 @@ namespace PostProcessor.ViewModels
 
         public ObservableCollection<TankData> TankData = GetTankData();
         public ObservableCollection<MotionsData> MotionsData = GetMotionsData();
+        public ObservableCollection<GeneralData> GeneralData = GetGeneralData();
+
+        private static ObservableCollection<GeneralData> GetGeneralData()
+        {
+            GeneralData row1 = new GeneralData(0.1, 0.2, 0.3, 0.4, 15, 0.5);
+            GeneralData row2 = new GeneralData(0.1, 0.2, 0.3, 0.4, 15, 0.5);
+
+            return new ObservableCollection<GeneralData> { row1, row2 };
+        }
 
         private static ObservableCollection<MotionsData> GetMotionsData()
         {

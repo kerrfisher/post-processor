@@ -32,6 +32,7 @@ namespace PostProcessor
 
             dataGrid3.DataContext = mainViewModel.TankData;
             dataGrid1.DataContext = mainViewModel.MotionsData;
+            dataGrid2.DataContext = mainViewModel.GeneralData;
         }
 
         private void OpenFileClick(object sender, RoutedEventArgs e)

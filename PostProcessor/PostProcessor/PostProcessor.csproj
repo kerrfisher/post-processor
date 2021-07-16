@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\GeneralData.cs" />
     <Compile Include="Models\LinearData.cs" />
     <Compile Include="Models\MotionsData.cs" />
     <Compile Include="Models\TankData.cs" />
