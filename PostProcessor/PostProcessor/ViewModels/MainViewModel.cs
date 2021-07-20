@@ -73,7 +73,7 @@ namespace PostProcessor.ViewModels
                 // Read file date from file
                 GetFileDate(reader.ReadLine());
 
-                for(int i = 0; i < 1063; i++)
+                for(int i = 0; i < 1064; i++)
                 {
                     reader.ReadLine();
                 }
@@ -85,6 +85,16 @@ namespace PostProcessor.ViewModels
 
                 line = reader.ReadLine();
                 string tankTo = line.Substring(0, line.IndexOf(':'));
+
+                // 1067
+                for (int i = 0; i < 1028; i++)
+                {
+                    reader.ReadLine();
+                }
+
+                line = reader.ReadLine();
+                string meanHeelAngle = line.Substring(line.IndexOf(':')).Split(',')[1];
+                string meanPitchAngle = line.Substring(line.IndexOf(':')).Split(',')[1].Trim();
 
                 reader.Close();
             }
