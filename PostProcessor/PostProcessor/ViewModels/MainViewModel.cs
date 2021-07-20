@@ -17,6 +17,8 @@ namespace PostProcessor.ViewModels
         public ObservableCollection<MotionsData> MotionsData = GetMotionsData();
         public ObservableCollection<GeneralData> GeneralData = GetGeneralData();
 
+        public ObservableCollection<TankData> Tanks = new ObservableCollection<TankData>();
+
         private static ObservableCollection<GeneralData> GetGeneralData()
         {
             GeneralData row1 = new GeneralData(0.1, 0.2, 0.3, 0.4, 15, 0.5);
@@ -71,13 +73,28 @@ namespace PostProcessor.ViewModels
                 // Read file date from file
                 GetFileDate(reader.ReadLine());
 
+                for(int i = 0; i < 1063; i++)
+                {
+                    reader.ReadLine();
+                }
+
+                string line = reader.ReadLine();
+                string tankFrom = line.Substring(0, line.IndexOf(':'));
+
+                reader.ReadLine();
+
+                line = reader.ReadLine();
+                string tankTo = line.Substring(0, line.IndexOf(':'));
+
                 reader.Close();
             }
         }
 
-        public void GetFileDate(string line)
+        private void GetFileDate(string line)
         {
             FileDate = line;
         }
+
+        
     }
 }
