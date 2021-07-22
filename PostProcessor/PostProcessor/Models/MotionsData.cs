@@ -8,11 +8,13 @@ namespace PostProcessor.Models
 {
     public class MotionsData
     {
+        public int Number { get; set; }
         public LinearData Heel { get; set; }
         public LinearData Pitch { get; set; }
 
-        public MotionsData(LinearData heel, LinearData pitch)
+        public MotionsData(int number, LinearData heel, LinearData pitch)
         {
+            Number = number;
             Heel = heel;
             Pitch = pitch;
         }

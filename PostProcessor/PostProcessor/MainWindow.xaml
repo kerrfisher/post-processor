@@ -47,7 +47,7 @@
 
                     <DataGrid x:Name="dataGrid1" ItemsSource="{Binding}" Margin="10" Grid.Column="0" Grid.Row="1" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Shift no."/>
+                            <DataGridTextColumn Header="Shift no." Binding="{Binding Number}"/>
                             <DataGridTextColumn Header="H Slope" Binding="{Binding Heel.Slope}"/>
                             <DataGridTextColumn Header="H StdDev" Binding="{Binding Heel.StdDev}"/>
                             <DataGridTextColumn Header="H x,y" Binding="{Binding Heel.XY}"/>
@@ -59,7 +59,7 @@
                     
                     <DataGrid x:Name="dataGrid2" ItemsSource="{Binding}" Grid.Column="1" Grid.Row="1" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Shift no."/>
+                            <DataGridTextColumn Header="Shift no." Binding="{Binding Number}"/>
                             <DataGridTextColumn Header="Trans" Binding="{Binding TransversalMoment}"/>
                             <DataGridTextColumn Header="Long" Binding="{Binding LongitudinalMoment}"/>
                             <DataGridTextColumn Header="Avg H" Binding="{Binding AverageHeel}"/>
@@ -77,7 +77,7 @@
                     </Grid.ColumnDefinitions>
                     <DataGrid x:Name="dataGrid3" ItemsSource="{Binding}" Grid.Column="0" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Shift no."/>
+                            <DataGridTextColumn Header="Shift no." Binding="{Binding Number}"/>
                             <DataGridTextColumn Header="Tank no." Binding="{Binding TankName}"/>
                             <DataGridTextColumn Header="LCG" Binding="{Binding LCG}"/>
                             <DataGridTextColumn Header="TCG" Binding="{Binding TCG}"/>
@@ -87,7 +87,7 @@
                     </DataGrid>
                     <DataGrid x:Name="dataGrid4" ItemsSource="{Binding}"  Grid.Column="1" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Shift no."/>
+                            <DataGridTextColumn Header="Shift no." Binding="{Binding Number}"/>
                             <DataGridTextColumn Header="Tank no." Binding="{Binding TankName}"/>
                             <DataGridTextColumn Header="LCG" Binding="{Binding LCG}"/>
                             <DataGridTextColumn Header="TCG" Binding="{Binding TCG}"/>
