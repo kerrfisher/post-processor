@@ -85,7 +85,7 @@
                             <DataGridTextColumn Header="Weight" Binding="{Binding Weight}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <DataGrid x:Name="dataGrid4" Grid.Column="1" Margin="10" ColumnWidth="*">
+                    <DataGrid x:Name="dataGrid4" ItemsSource="{Binding}"  Grid.Column="1" Margin="10" AutoGenerateColumns="False" ColumnWidth="*">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Shift no."/>
                             <DataGridTextColumn Header="Tank no." Binding="{Binding TankName}"/>

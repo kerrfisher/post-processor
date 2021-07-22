@@ -30,9 +30,10 @@ namespace PostProcessor
 
             this.mainViewModel = mainViewModel;
 
-            dataGrid3.DataContext = mainViewModel.TankData;
             dataGrid1.DataContext = mainViewModel.MotionsData;
             dataGrid2.DataContext = mainViewModel.GeneralData;
+            dataGrid3.DataContext = mainViewModel.TankFromData;
+            dataGrid4.DataContext = mainViewModel.TankToData;
         }
 
         private void OpenFileClick(object sender, RoutedEventArgs e)
