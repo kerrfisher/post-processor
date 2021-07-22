@@ -80,79 +80,91 @@ namespace PostProcessor.ViewModels
             using (StreamReader reader = new StreamReader(filepath))
             {
                 // Read file date from file
-                GetFileDate(reader.ReadLine());
+                FileDate = reader.ReadLine();
 
+                // Iterate over calibration run
                 for(int i = 0; i < 1063; i++)
                 {
                     reader.ReadLine();
                 }
 
+                // Read shift number
                 string line = reader.ReadLine();
                 string numRecord = line.Substring(line.IndexOf(':') + 1).Trim();
 
+                // Read draught at shift
                 line = reader.ReadLine();
                 string draught = line.Substring(line.IndexOf(':') + 1).Trim();
 
+                // Read displacement at shift
                 line = reader.ReadLine();
                 string displacement = line.Substring(line.IndexOf(':') + 1).Trim();
 
                 reader.ReadLine();
 
+                // Read tank from name
                 line = reader.ReadLine();
                 string tankFrom = line.Substring(0, line.IndexOf(':'));
 
                 reader.ReadLine();
 
+                // Read tank to name
                 line = reader.ReadLine();
                 string tankTo = line.Substring(0, line.IndexOf(':'));
 
-                // 1067
+                // Iterate over heel and pitch data
                 for (int i = 0; i < 1028; i++)
                 {
                     reader.ReadLine();
                 }
 
+                // Read average heel and pitch angles
                 line = reader.ReadLine();
                 string meanHeelAngle = line.Substring(line.IndexOf(':') + 1).Split(',')[0].Trim();
                 string meanPitchAngle = line.Substring(line.IndexOf(':')).Split(',')[1].Trim();
 
+                // Assign plot of shift no and average motion
                 string heelPlot = numRecord + "," + meanHeelAngle;
                 string pitchPlot = numRecord + "," + meanPitchAngle;
 
+                // Read heel and pitch slope
                 line = reader.ReadLine();
                 string heelSlope = line.Substring(line.IndexOf(':') + 1).Split(',')[0].Trim();
                 string pitchSlope = line.Substring(line.IndexOf(':')).Split(',')[1].Trim();
 
+                // Read heel and pitch standard deviation
                 line = reader.ReadLine();
                 string heelStdDev = line.Substring(line.IndexOf(':') + 1).Split(',')[0].Trim();
                 string pitchStdDev = line.Substring(line.IndexOf(':')).Split(',')[1].Trim();
 
+                // Add motions data to DataGrid
                 MotionsData.Add(new MotionsData(new LinearData(Convert.ToDouble(heelSlope), Convert.ToDouble(heelStdDev), heelPlot), new LinearData(Convert.ToDouble(pitchSlope), Convert.ToDouble(pitchStdDev), pitchPlot)));
 
+
+                // Split up and read tank values
                 line = reader.ReadLine();
                 string[] tankValues = line.Substring(line.IndexOf(':') + 1).Split(',');
-                // string tankName, double lcg, double tcg, double level, double weight
                 TankData stbdTank = new TankData(tankFrom, Convert.ToDouble(tankValues[0].Trim()), Convert.ToDouble(tankValues[1].Trim()), Convert.ToDouble(tankValues[2].Trim()), Convert.ToDouble(tankValues[3].Trim()));
+                // Add tank from data to DataGrid
                 TankFromData.Add(stbdTank);
 
+                // Split up and read tank values
                 line = reader.ReadLine();
                 tankValues = line.Substring(line.IndexOf(':') + 1).Split(',');
                 TankData portTank = new TankData(tankTo, Convert.ToDouble(tankValues[0].Trim()), Convert.ToDouble(tankValues[1].Trim()), Convert.ToDouble(tankValues[2].Trim()), Convert.ToDouble(tankValues[3].Trim()));
+                // Add tank from data to DataGrid
                 TankToData.Add(portTank);
 
+                // Calculate transversal and longitudinal moment
                 double transMoment = new double[]{ stbdTank.Weight, portTank.Weight }.Average() * new double[] { stbdTank.TCG, portTank.TCG }.Average();
                 double longMoment = new double[] { stbdTank.Weight, portTank.Weight }.Average() * new double[] { stbdTank.LCG, portTank.LCG }.Average();
 
-                // double transversalMoment, double longitudinalMoment, double averageHeel, double averageTrim, double draught, double correspondingDisplacement
+                // Add general data to DataGrid
                 GeneralData.Add(new GeneralData(transMoment, longMoment, Convert.ToDouble(meanHeelAngle), Convert.ToDouble(meanPitchAngle), Convert.ToDouble(draught), Convert.ToDouble(displacement)));
 
+                // Close stream
                 reader.Close();
             }
-        }
-
-        private void GetFileDate(string line)
-        {
-            FileDate = line;
         }
     }
 }
