@@ -55,8 +55,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\TestAnalysisHelper.cs" />
+    <Compile Include="Models\Calibration.cs" />
     <Compile Include="Models\GeneralData.cs" />
     <Compile Include="Models\LinearData.cs" />
+    <Compile Include="Models\Motions.cs" />
     <Compile Include="Models\MotionsData.cs" />
     <Compile Include="Models\TankData.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

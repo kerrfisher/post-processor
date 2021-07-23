@@ -1,4 +1,5 @@
-﻿using PostProcessor.Models;
+﻿using PostProcessor.Helpers;
+using PostProcessor.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,6 +24,9 @@ namespace PostProcessor.ViewModels
         public ObservableCollection<GeneralData> GeneralData = new ObservableCollection<GeneralData>();
         public ObservableCollection<TankData> TankFromData = new ObservableCollection<TankData>();
         public ObservableCollection<TankData> TankToData = new ObservableCollection<TankData>();
+
+        // Holds data related to the calibration run
+        Calibration calibration = new Calibration();
 
         // Dummy data for testing
         private static ObservableCollection<GeneralData> GetGeneralData()
@@ -82,11 +86,13 @@ namespace PostProcessor.ViewModels
                 // Read file date from file
                 FileDate = reader.ReadLine();
 
-                // Iterate over calibration run
-                for(int i = 0; i < 1063; i++)
+                // Iterate over general information
+                for(int i = 0; i < 31; i++)
                 {
                     reader.ReadLine();
                 }
+
+                ReadCalibrationRun(reader);
 
                 // Line with test number
                 string line = reader.ReadLine();
@@ -95,6 +101,38 @@ namespace PostProcessor.ViewModels
 
                 // Close stream
                 reader.Close();
+            }
+        }
+
+        private void ReadCalibrationRun(StreamReader reader)
+        {
+            List<Motions> calibrationRun = new List<Motions>();
+            for (int i = 0; i < 1024; i++)
+            {
+                string[] line = reader.ReadLine().Split(',');
+                calibrationRun.Add(new Motions(Convert.ToDouble(line[0]), Convert.ToDouble(line[1])));
+            }
+
+            calibration.Motions = calibrationRun;
+
+            List<double> heels = new List<double>();
+            List<double> pitchs = new List<double>();
+
+            foreach(Motions motion in calibrationRun)
+            {
+                heels.Add(motion.Heel);
+                pitchs.Add(motion.Pitch);
+            }
+
+            // Calculate calibrations slope and standard deviation
+            TestAnalysisHelper calibrationHeelAnalysisHelper = new TestAnalysisHelper(heels, 512, 1024);
+            calibration.Heel = new LinearData(calibrationHeelAnalysisHelper.Slope(), calibrationHeelAnalysisHelper.StandardDeviation(heels.AsEnumerable()), "");
+            TestAnalysisHelper calibrationPitchAnalysisHelper = new TestAnalysisHelper(pitchs, 512, 1024);
+            calibration.Pitch = new LinearData(calibrationPitchAnalysisHelper.Slope(), calibrationPitchAnalysisHelper.StandardDeviation(pitchs.AsEnumerable()), "");
+
+            for (int i = 0; i < 8; i++)
+            {
+                reader.ReadLine();
             }
         }
 
@@ -188,6 +226,26 @@ namespace PostProcessor.ViewModels
                     ReadShift(reader, line);
                 }
             }            
+        }
+
+        public void CheckConsistencies()
+        {
+            List<bool> motions = new List<bool>(); 
+
+            foreach(MotionsData data in MotionsData)
+            {
+                // Check heel and pitchs slope and stdDev
+                if(data.Heel.Slope > OneOrderMagnitudeLarger(calibration.Heel.Slope) || data.Heel.StdDev > OneOrderMagnitudeLarger(calibration.Heel.StdDev) || data.Pitch.Slope > OneOrderMagnitudeLarger(calibration.Pitch.Slope) || data.Pitch.StdDev > OneOrderMagnitudeLarger(calibration.Pitch.StdDev))
+                {
+                    motions.Add(true);
+                }
+            }
+        }
+
+        // Caculates one magnitude larger of a
+        private double OneOrderMagnitudeLarger(double a)
+        {
+            return a * Math.Pow(10, 1);
         }
     }
 }
