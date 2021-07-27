@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PostProcessor.ViewModels
 {
@@ -17,9 +18,6 @@ namespace PostProcessor.ViewModels
         
         // Observable objects for DataGrid's
         // Observable objects have notify property handling ingrained
-        //public ObservableCollection<MotionsData> MotionsData = GetMotionsData();
-        //public ObservableCollection<GeneralData> GeneralData = GetGeneralData();
-        //public ObservableCollection<TankData> TankFromData = GetTankData();
         public ObservableCollection<MotionsData> MotionsData = new ObservableCollection<MotionsData>();
         public ObservableCollection<GeneralData> GeneralData = new ObservableCollection<GeneralData>();
         public ObservableCollection<TankData> TankFromData = new ObservableCollection<TankData>();
@@ -27,41 +25,6 @@ namespace PostProcessor.ViewModels
 
         // Holds data related to the calibration run
         Calibration calibration = new Calibration();
-
-        // Dummy data for testing
-        private static ObservableCollection<GeneralData> GetGeneralData()
-        {
-            GeneralData row1 = new GeneralData(1, 0.1, 0.2, 0.3, 0.4, 15, 0.5);
-            GeneralData row2 = new GeneralData(2, 0.1, 0.2, 0.3, 0.4, 15, 0.5);
-
-            return new ObservableCollection<GeneralData> { row1, row2 };
-        }
-
-        // Dummy data for testing
-        private static ObservableCollection<MotionsData> GetMotionsData()
-        {
-            MotionsData row1 = new MotionsData(1, new LinearData(0.2, 0.4, "7.8,9"), new LinearData(0.3, 0.8, "3.9,4.5"));
-            MotionsData row2 = new MotionsData(2, new LinearData(1.2, 1.4, "17.8,19"), new LinearData(1.3, 1.8, "13.9,14.5"));
-
-            ObservableCollection<MotionsData> motionsData = new ObservableCollection<MotionsData>();
-            motionsData.Add(row1);
-            motionsData.Add(row2);
-
-            return motionsData;
-        }
-
-        // Dummy data for testing
-        private static ObservableCollection<TankData> GetTankData()
-        {
-            TankData row1 = new TankData(1, "SWB4P", 4.5, 3.2, 0.2, 45);
-            TankData row2 = new TankData(2, "SWB4S", 6.7, 2.1, 0.4, 90);
-            TankData row3 = new TankData(3, "SWB4S", 6.7, 2.1, 0.4, 90);
-            TankData row4 = new TankData(4, "SWB4S", 6.7, 2.1, 0.4, 90);
-            TankData row5 = new TankData(5, "SWB4S", 6.7, 2.1, 0.4, 90);
-            TankData row6= new TankData(6, "SWB4S", 6.7, 2.1, 0.4, 90);
-
-            return new ObservableCollection<TankData> { row1, row2, row3, row4, row5, row6 };
-        }
 
         // Date when mosis test was undetaken
         private string _fileDate;
@@ -246,6 +209,70 @@ namespace PostProcessor.ViewModels
         private double OneOrderMagnitudeLarger(double a)
         {
             return a * Math.Pow(10, 1);
+        }
+
+        public void VerifyUnexpectedChangeTrim()
+        {
+            int numOfRecords = TankFromData.Count;
+
+            for (int i = 0; i < numOfRecords; i++)
+            {
+                // Shift is only transversal
+                if ((TankToData[i].LCG - TankFromData[i].LCG) < 1)
+                {
+                    // If i == 0, compare with calibration
+                    if(i == 0)
+                    {
+                        // Check against calibration's trim
+                        if ((GeneralData[i].AverageTrim - calibration.Motions.Average(x => x.Pitch)) < 0.1)
+                        {
+                            MessageBox.Show($"Trim at {i} exceeds 0.1 deg");
+                        }
+                    }
+                    else
+                    {
+                        if ((GeneralData[i].AverageTrim - GeneralData[i - 1].AverageTrim) < 0.1)
+                        {
+                            MessageBox.Show($"Trim at {i} exceeds 0.1 deg");
+                        }
+                    }
+                }
+            }
+        }
+
+        public void VerifyUnexpectedChangeHeel()
+        {
+            int numOfRecords = TankFromData.Count;
+
+            for (int i = 0; i < numOfRecords; i++)
+            {
+                // Shift is only longitudinal
+                if ((TankToData[i].TCG - TankFromData[i].TCG) < 1)
+                {
+                    // If i == 0, compare with calibration
+                    if (i == 0)
+                    {
+                        // Check against calibration's trim
+                        if ((GeneralData[i].AverageHeel - calibration.Motions.Average(x => x.Heel)) < 0.1)
+                        {
+                            MessageBox.Show($"Heel at {i} exceeds 0.1 deg");
+                        }
+                    }
+                    else
+                    {
+                        if ((GeneralData[i].AverageHeel - GeneralData[i - 1].AverageHeel) < 0.1)
+                        {
+                            MessageBox.Show($"Heel at {i} exceeds 0.1 deg");
+                        }
+                    }
+                }
+            }
+        }
+
+        public void CheckDraughtConsistency()
+        {
+            SemisubDraught semisubDraught = new SemisubDraught();
+            semisubDraught.SetCoordinates(0);
         }
     }
 }

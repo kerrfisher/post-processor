@@ -56,7 +56,11 @@ namespace PostProcessor
                 {
                     lblFilename.Content = System.IO.Path.GetFileName(filepathUri.LocalPath);
                     mainViewModel.ReadFileContents(dlg.FileName);
+                    // Analyse output file's contents
                     mainViewModel.CheckConsistencies();
+                    mainViewModel.VerifyUnexpectedChangeTrim();
+                    mainViewModel.VerifyUnexpectedChangeHeel();
+                    mainViewModel.CheckDraughtConsistency();
                 }
             }
         }
