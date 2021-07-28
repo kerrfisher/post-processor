@@ -15,7 +15,7 @@ namespace PostProcessor.ViewModels
     {
         // File name of current MOSIS output
         public string Filename { get; set; }
-        
+
         // Observable objects for DataGrid's
         // Observable objects have notify property handling ingrained
         public ObservableCollection<MotionsData> MotionsData = new ObservableCollection<MotionsData>();
@@ -26,8 +26,11 @@ namespace PostProcessor.ViewModels
         // Holds data related to the calibration run
         Calibration calibration = new Calibration();
 
-        // Initial draughts - taken before the calibration run
-        double[] initialDraughts = new double[4];
+        // List of draughts, contains draughts at each shift
+        private List<Draughts> AllDraughts = new List<Draughts>();
+
+        // Determines whether draughts were read from draught marks or gauges
+        bool isDraughtReadFromMarks;
 
         // Date when mosis test was undetaken
         private string _fileDate;
@@ -53,13 +56,13 @@ namespace PostProcessor.ViewModels
                 FileDate = reader.ReadLine();
 
                 // Iterate over general information
-                for(int i = 0; i < 27; i++)
+                for (int i = 0; i < 27; i++)
                 {
                     reader.ReadLine();
                 }
 
                 string[] draughts = reader.ReadLine().Split(',');
-                initialDraughts = new double[] { Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3]) };
+                AllDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
 
                 for (int i = 0; i < 3; i++)
                 {
@@ -92,7 +95,7 @@ namespace PostProcessor.ViewModels
             List<double> heels = new List<double>();
             List<double> pitchs = new List<double>();
 
-            foreach(Motions motion in calibrationRun)
+            foreach (Motions motion in calibrationRun)
             {
                 heels.Add(motion.Heel);
                 pitchs.Add(motion.Pitch);
@@ -122,12 +125,19 @@ namespace PostProcessor.ViewModels
 
             // Read draught at shift
             line = reader.ReadLine();
-            string draught = line.Substring(line.IndexOf(':') + 1).Trim();
+            string[] draughts = line.Substring(line.IndexOf(':') + 1).Split(',');
+            AllDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
+            double meanDraught = draughts.Average(x => Convert.ToDouble(x));
 
             // Read displacement at shift
             line = reader.ReadLine();
             string displacement = line.Substring(line.IndexOf(':') + 1).Trim();
 
+            // Read which method was used to read draughts
+            line = reader.ReadLine();
+            isDraughtReadFromMarks = line.Substring(line.IndexOf(':')).Equals("0");
+
+            reader.ReadLine();
             reader.ReadLine();
 
             // Read tank from name
@@ -187,11 +197,11 @@ namespace PostProcessor.ViewModels
             double longMoment = new double[] { stbdTank.Weight, portTank.Weight }.Average() * new double[] { stbdTank.LCG, portTank.LCG }.Average();
 
             // Add general data to DataGrid
-            GeneralData.Add(new GeneralData(Convert.ToInt32(numRecord), transMoment, longMoment, Convert.ToDouble(meanHeelAngle), Convert.ToDouble(meanPitchAngle), Convert.ToDouble(draught), Convert.ToDouble(displacement)));
+            GeneralData.Add(new GeneralData(Convert.ToInt32(numRecord), transMoment, longMoment, Convert.ToDouble(meanHeelAngle), Convert.ToDouble(meanPitchAngle), Convert.ToDouble(meanDraught), Convert.ToDouble(displacement)));
 
             line = reader.ReadLine();
             // Since this might be the end of the file, it might return null
-            if(line != null)
+            if (line != null)
             {
                 // Check line starts with "Test"
                 if (line.Substring(0, 4).Equals("Test"))
@@ -199,17 +209,17 @@ namespace PostProcessor.ViewModels
                     // Recall method
                     ReadShift(reader, line);
                 }
-            }            
+            }
         }
 
         public void CheckConsistencies()
         {
-            List<bool> motions = new List<bool>(); 
+            List<bool> motions = new List<bool>();
 
-            foreach(MotionsData data in MotionsData)
+            foreach (MotionsData data in MotionsData)
             {
                 // Check heel and pitchs slope and stdDev
-                if(data.Heel.Slope > OneOrderMagnitudeLarger(calibration.Heel.Slope) || data.Heel.StdDev > OneOrderMagnitudeLarger(calibration.Heel.StdDev) || data.Pitch.Slope > OneOrderMagnitudeLarger(calibration.Pitch.Slope) || data.Pitch.StdDev > OneOrderMagnitudeLarger(calibration.Pitch.StdDev))
+                if (data.Heel.Slope > OneOrderMagnitudeLarger(calibration.Heel.Slope) || data.Heel.StdDev > OneOrderMagnitudeLarger(calibration.Heel.StdDev) || data.Pitch.Slope > OneOrderMagnitudeLarger(calibration.Pitch.Slope) || data.Pitch.StdDev > OneOrderMagnitudeLarger(calibration.Pitch.StdDev))
                 {
                     motions.Add(true);
                 }
@@ -232,7 +242,7 @@ namespace PostProcessor.ViewModels
                 if ((TankToData[i].LCG - TankFromData[i].LCG) < 1)
                 {
                     // If i == 0, compare with calibration
-                    if(i == 0)
+                    if (i == 0)
                     {
                         // Check against calibration's trim
                         if ((GeneralData[i].AverageTrim - calibration.Motions.Average(x => x.Pitch)) < 0.1)
@@ -286,21 +296,24 @@ namespace PostProcessor.ViewModels
             // Set the coordinates to be used when computing the plane
             semisubDraught.SetCoordinates(0);
 
-            // This will be updated to be taken from outputs
-            //double[] draughts = new double[4];
-            double[] draughts = initialDraughts;
+            // Take first draught for now
 
-            // Loop through each measured draught and check against the calculated draught
-            for (int i = 0; i < 4; i++)
+            // Loop through all draughts, start from one to avoid draughts taken before calibration
+            for (int i = 1; i < AllDraughts.Count; i++)
             {
-                // Create new array with draught at i removed
-                List<double> shortenedDraughts = draughts.ToList();
-                shortenedDraughts.RemoveAt(i);
-                semisubDraught.ComputePlane(shortenedDraughts.ToArray());
-                // Check against measured draught
-                if((semisubDraught.draught - draughts[i]) > 0.05)
+                double[] draughts = new double[] { AllDraughts[i].SF, AllDraughts[i].PF, AllDraughts[i].SA, AllDraughts[i].PA };
+                // Loop through each measured draught and check against the calculated draught
+                for (int j = 0; j < 4; j++)
                 {
-                    // Flag warning
+                    // Create new array with draught at i removed
+                    List<double> shortenedDraughts = draughts.ToList();
+                    shortenedDraughts.RemoveAt(i);
+                    semisubDraught.ComputePlane(shortenedDraughts.ToArray());
+                    // Check against measured draught
+                    if ((semisubDraught.draught - draughts[j]) > 0.05)
+                    {
+                        // Flag warning
+                    }
                 }
             }
         }

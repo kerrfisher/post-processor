@@ -59,6 +59,7 @@
     <Compile Include="Helpers\ShipShapedDraught.cs" />
     <Compile Include="Helpers\TestAnalysisHelper.cs" />
     <Compile Include="Models\Calibration.cs" />
+    <Compile Include="Models\Draughts.cs" />
     <Compile Include="Models\GeneralData.cs" />
     <Compile Include="Models\LinearData.cs" />
     <Compile Include="Models\Motions.cs" />
