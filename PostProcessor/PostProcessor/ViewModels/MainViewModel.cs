@@ -26,6 +26,9 @@ namespace PostProcessor.ViewModels
         // Holds data related to the calibration run
         Calibration calibration = new Calibration();
 
+        // Initial draughts - taken before the calibration run
+        double[] initialDraughts = new double[4];
+
         // Date when mosis test was undetaken
         private string _fileDate;
         public string FileDate
@@ -50,7 +53,15 @@ namespace PostProcessor.ViewModels
                 FileDate = reader.ReadLine();
 
                 // Iterate over general information
-                for(int i = 0; i < 31; i++)
+                for(int i = 0; i < 27; i++)
+                {
+                    reader.ReadLine();
+                }
+
+                string[] draughts = reader.ReadLine().Split(',');
+                initialDraughts = new double[] { Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3]) };
+
+                for (int i = 0; i < 3; i++)
                 {
                     reader.ReadLine();
                 }
@@ -272,7 +283,26 @@ namespace PostProcessor.ViewModels
         public void CheckDraughtConsistency()
         {
             SemisubDraught semisubDraught = new SemisubDraught();
+            // Set the coordinates to be used when computing the plane
             semisubDraught.SetCoordinates(0);
+
+            // This will be updated to be taken from outputs
+            //double[] draughts = new double[4];
+            double[] draughts = initialDraughts;
+
+            // Loop through each measured draught and check against the calculated draught
+            for (int i = 0; i < 4; i++)
+            {
+                // Create new array with draught at i removed
+                List<double> shortenedDraughts = draughts.ToList();
+                shortenedDraughts.RemoveAt(i);
+                semisubDraught.ComputePlane(shortenedDraughts.ToArray());
+                // Check against measured draught
+                if((semisubDraught.draught - draughts[i]) > 0.05)
+                {
+                    // Flag warning
+                }
+            }
         }
     }
 }

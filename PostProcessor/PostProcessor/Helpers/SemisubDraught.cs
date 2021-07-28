@@ -65,7 +65,7 @@ namespace PostProcessor.Helpers
                 }
             }
 
-            for (int i = 0; i <= 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 SumTerms(draughts[i], GetRow(coordinates, i + 1));
             }
