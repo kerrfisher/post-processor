@@ -61,6 +61,7 @@ namespace PostProcessor
                     mainViewModel.VerifyUnexpectedChangeTrim();
                     mainViewModel.VerifyUnexpectedChangeHeel();
                     mainViewModel.CheckDraughtConsistency();
+                    mainViewModel.CheckDisplacementChange();
                 }
             }
         }

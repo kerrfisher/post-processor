@@ -29,6 +29,8 @@ namespace PostProcessor.ViewModels
         // List of draughts, contains draughts at each shift
         private List<Draughts> AllDraughts = new List<Draughts>();
 
+        private List<VesselCondition> vesselConditions = new List<VesselCondition>();
+
         // Determines whether draughts were read from draught marks or gauges
         bool isDraughtReadFromMarks;
 
@@ -64,7 +66,11 @@ namespace PostProcessor.ViewModels
                 string[] draughts = reader.ReadLine().Split(',');
                 AllDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
 
-                for (int i = 0; i < 3; i++)
+                string line = reader.ReadLine();
+                VesselCondition vesselCondition = new VesselCondition();
+                vesselCondition.Displacement = Convert.ToDouble(line.Split(',')[0]);
+
+                for (int i = 0; i < 2; i++)
                 {
                     reader.ReadLine();
                 }
@@ -72,7 +78,7 @@ namespace PostProcessor.ViewModels
                 ReadCalibrationRun(reader);
 
                 // Line with test number
-                string line = reader.ReadLine();
+                line = reader.ReadLine();
                 // Recursive method that will repeat if there are more tests
                 ReadShift(reader, line);
 
@@ -131,7 +137,10 @@ namespace PostProcessor.ViewModels
 
             // Read displacement at shift
             line = reader.ReadLine();
-            string displacement = line.Substring(line.IndexOf(':') + 1).Trim();
+            VesselCondition vesselCondition = new VesselCondition();
+            vesselCondition.Displacement = Convert.ToDouble(line.Split(',')[0].Substring(line.IndexOf(':') + 1).Trim());
+            vesselCondition.TCP = Convert.ToDouble(line.Split(',')[1].Substring(line.Split(',')[1].IndexOf(':') + 1).Trim());
+            vesselConditions.Add(vesselCondition);
 
             // Read which method was used to read draughts
             line = reader.ReadLine();
@@ -197,7 +206,7 @@ namespace PostProcessor.ViewModels
             double longMoment = new double[] { stbdTank.Weight, portTank.Weight }.Average() * new double[] { stbdTank.LCG, portTank.LCG }.Average();
 
             // Add general data to DataGrid
-            GeneralData.Add(new GeneralData(Convert.ToInt32(numRecord), transMoment, longMoment, Convert.ToDouble(meanHeelAngle), Convert.ToDouble(meanPitchAngle), Convert.ToDouble(meanDraught), Convert.ToDouble(displacement)));
+            GeneralData.Add(new GeneralData(Convert.ToInt32(numRecord), transMoment, longMoment, Convert.ToDouble(meanHeelAngle), Convert.ToDouble(meanPitchAngle), Convert.ToDouble(meanDraught), Convert.ToDouble(vesselCondition.Displacement)));
 
             line = reader.ReadLine();
             // Since this might be the end of the file, it might return null
@@ -313,7 +322,21 @@ namespace PostProcessor.ViewModels
                     if ((semisubDraught.draught - draughts[j]) > 0.05)
                     {
                         // Flag warning
+                        MessageBox.Show($"At shift {i} the measured draught {semisubDraught.draught} minus the expected draught {draughts[j]} is greater than 0.05.");
                     }
+                }
+            }
+        }
+
+        public void CheckDisplacementChange()
+        {
+            // Loop through vessel conditions and check displacements
+            for(int i = 1; i < vesselConditions.Count; i++)
+            {
+                if(Math.Abs((vesselConditions[i].Displacement - vesselConditions[i - 1].Displacement)) > vesselConditions[i].TCP)
+                {
+                    // Flag warning
+                    MessageBox.Show($"At shift {i} the difference in displacements is greater than TCP");
                 }
             }
         }
