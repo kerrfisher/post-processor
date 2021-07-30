@@ -305,8 +305,6 @@ namespace PostProcessor.ViewModels
             // Set the coordinates to be used when computing the plane
             semisubDraught.SetCoordinates(0);
 
-            // Take first draught for now
-
             // Loop through all draughts, start from one to avoid draughts taken before calibration
             for (int i = 1; i < AllDraughts.Count; i++)
             {
