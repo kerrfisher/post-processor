@@ -62,6 +62,7 @@ namespace PostProcessor
                     mainViewModel.VerifyUnexpectedChangeHeel();
                     mainViewModel.CheckDraughtConsistency();
                     mainViewModel.CheckDisplacementChange();
+                    mainViewModel.CheckTotalBallastContent();
                 }
             }
         }

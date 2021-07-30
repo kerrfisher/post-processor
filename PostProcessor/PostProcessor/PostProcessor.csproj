@@ -65,6 +65,7 @@
     <Compile Include="Models\Motions.cs" />
     <Compile Include="Models\MotionsData.cs" />
     <Compile Include="Models\TankData.cs" />
+    <Compile Include="Models\TankLevels.cs" />
     <Compile Include="Models\VesselCondition.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />

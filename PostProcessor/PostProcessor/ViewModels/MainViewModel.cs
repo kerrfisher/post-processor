@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace PostProcessor.ViewModels
@@ -27,9 +25,12 @@ namespace PostProcessor.ViewModels
         Calibration calibration = new Calibration();
 
         // List of draughts, contains draughts at each shift
-        private List<Draughts> AllDraughts = new List<Draughts>();
+        private List<Draughts> allDraughts = new List<Draughts>();
 
         private List<VesselCondition> vesselConditions = new List<VesselCondition>();
+
+        // List of tank levels per shift and the tank names
+        private List<TankLevels> allTankLevels = new List<TankLevels>();
 
         // Determines whether draughts were read from draught marks or gauges
         bool isDraughtReadFromMarks;
@@ -64,7 +65,7 @@ namespace PostProcessor.ViewModels
                 }
 
                 string[] draughts = reader.ReadLine().Split(',');
-                AllDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
+                allDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
 
                 string line = reader.ReadLine();
                 VesselCondition vesselCondition = new VesselCondition();
@@ -132,7 +133,7 @@ namespace PostProcessor.ViewModels
             // Read draught at shift
             line = reader.ReadLine();
             string[] draughts = line.Substring(line.IndexOf(':') + 1).Split(',');
-            AllDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
+            allDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
             double meanDraught = draughts.Average(x => Convert.ToDouble(x));
 
             // Read displacement at shift
@@ -149,15 +150,24 @@ namespace PostProcessor.ViewModels
             reader.ReadLine();
             reader.ReadLine();
 
-            // Read tank from name
+            // Read tank (from) name
             line = reader.ReadLine();
-            string tankFrom = line.Substring(0, line.IndexOf(':'));
+            // TankLevels object to be added to tank levels list
+            TankLevels tankLevels = new TankLevels();
+            tankLevels.TankFrom = line.Substring(0, line.IndexOf(':'));
+            tankLevels.TankFromStartLevel = Convert.ToDouble(line.Substring(line.IndexOf(':') + 1).Split(',')[0]);
+            tankLevels.TankFromEndLevel = Convert.ToDouble(line.Substring(line.IndexOf(':') + 1).Split(',')[1]);
 
             reader.ReadLine();
 
-            // Read tank to name
+            // Read tank (to) name
             line = reader.ReadLine();
-            string tankTo = line.Substring(0, line.IndexOf(':'));
+            tankLevels.TankTo = line.Substring(0, line.IndexOf(':'));
+            tankLevels.TankToStartLevel = Convert.ToDouble(line.Substring(line.IndexOf(':') + 1).Split(',')[0]);
+            tankLevels.TankToEndLevel = Convert.ToDouble(line.Substring(line.IndexOf(':') + 1).Split(',')[1]);
+
+            // Add to list of tank levels
+            allTankLevels.Add(tankLevels);
 
             // Iterate over heel and pitch data
             for (int i = 0; i < 1028; i++)
@@ -190,14 +200,14 @@ namespace PostProcessor.ViewModels
             // Split up and read tank values
             line = reader.ReadLine();
             string[] tankValues = line.Substring(line.IndexOf(':') + 1).Split(',');
-            TankData stbdTank = new TankData(Convert.ToInt32(numRecord), tankFrom, Convert.ToDouble(tankValues[0].Trim()), Convert.ToDouble(tankValues[1].Trim()), Convert.ToDouble(tankValues[2].Trim()), Convert.ToDouble(tankValues[3].Trim()));
+            TankData stbdTank = new TankData(Convert.ToInt32(numRecord), tankLevels.TankFrom, Convert.ToDouble(tankValues[0].Trim()), Convert.ToDouble(tankValues[1].Trim()), Convert.ToDouble(tankValues[2].Trim()), Convert.ToDouble(tankValues[3].Trim()));
             // Add tank from data to DataGrid
             TankFromData.Add(stbdTank);
 
             // Split up and read tank values
             line = reader.ReadLine();
             tankValues = line.Substring(line.IndexOf(':') + 1).Split(',');
-            TankData portTank = new TankData(Convert.ToInt32(numRecord), tankTo, Convert.ToDouble(tankValues[0].Trim()), Convert.ToDouble(tankValues[1].Trim()), Convert.ToDouble(tankValues[2].Trim()), Convert.ToDouble(tankValues[3].Trim()));
+            TankData portTank = new TankData(Convert.ToInt32(numRecord), tankLevels.TankTo, Convert.ToDouble(tankValues[0].Trim()), Convert.ToDouble(tankValues[1].Trim()), Convert.ToDouble(tankValues[2].Trim()), Convert.ToDouble(tankValues[3].Trim()));
             // Add tank from data to DataGrid
             TankToData.Add(portTank);
 
@@ -256,14 +266,14 @@ namespace PostProcessor.ViewModels
                         // Check against calibration's trim
                         if ((GeneralData[i].AverageTrim - calibration.Motions.Average(x => x.Pitch)) < 0.1)
                         {
-                            MessageBox.Show($"Trim at {i} exceeds 0.1 deg");
+                            //MessageBox.Show($"Trim at {i} exceeds 0.1 deg");
                         }
                     }
                     else
                     {
                         if ((GeneralData[i].AverageTrim - GeneralData[i - 1].AverageTrim) < 0.1)
                         {
-                            MessageBox.Show($"Trim at {i} exceeds 0.1 deg");
+                            //MessageBox.Show($"Trim at {i} exceeds 0.1 deg");
                         }
                     }
                 }
@@ -285,14 +295,14 @@ namespace PostProcessor.ViewModels
                         // Check against calibration's trim
                         if ((GeneralData[i].AverageHeel - calibration.Motions.Average(x => x.Heel)) < 0.1)
                         {
-                            MessageBox.Show($"Heel at {i} exceeds 0.1 deg");
+                            //MessageBox.Show($"Heel at {i} exceeds 0.1 deg");
                         }
                     }
                     else
                     {
                         if ((GeneralData[i].AverageHeel - GeneralData[i - 1].AverageHeel) < 0.1)
                         {
-                            MessageBox.Show($"Heel at {i} exceeds 0.1 deg");
+                            //MessageBox.Show($"Heel at {i} exceeds 0.1 deg");
                         }
                     }
                 }
@@ -306,9 +316,9 @@ namespace PostProcessor.ViewModels
             semisubDraught.SetCoordinates(0);
 
             // Loop through all draughts, start from one to avoid draughts taken before calibration
-            for (int i = 1; i < AllDraughts.Count; i++)
+            for (int i = 1; i < allDraughts.Count; i++)
             {
-                double[] draughts = new double[] { AllDraughts[i].SF, AllDraughts[i].PF, AllDraughts[i].SA, AllDraughts[i].PA };
+                double[] draughts = new double[] { allDraughts[i].SF, allDraughts[i].PF, allDraughts[i].SA, allDraughts[i].PA };
                 // Loop through each measured draught and check against the calculated draught
                 for (int j = 0; j < 4; j++)
                 {
@@ -320,7 +330,7 @@ namespace PostProcessor.ViewModels
                     if ((semisubDraught.draught - draughts[j]) > 0.05)
                     {
                         // Flag warning
-                        MessageBox.Show($"At shift {i} the measured draught {semisubDraught.draught} minus the expected draught {draughts[j]} is greater than 0.05.");
+                        //MessageBox.Show($"At shift {i} the measured draught {semisubDraught.draught} minus the expected draught {draughts[j]} is greater than 0.05.");
                     }
                 }
             }
@@ -329,13 +339,60 @@ namespace PostProcessor.ViewModels
         public void CheckDisplacementChange()
         {
             // Loop through vessel conditions and check displacements
-            for(int i = 1; i < vesselConditions.Count; i++)
+            for (int i = 1; i < vesselConditions.Count; i++)
             {
-                if(Math.Abs((vesselConditions[i].Displacement - vesselConditions[i - 1].Displacement)) > vesselConditions[i].TCP)
+                if (Math.Abs((vesselConditions[i].Displacement - vesselConditions[i - 1].Displacement)) > vesselConditions[i].TCP)
                 {
                     // Flag warning
-                    MessageBox.Show($"At shift {i} the difference in displacements is greater than TCP");
+                    //MessageBox.Show($"At shift {i} the difference in displacements is greater than TCP");
                 }
+            }
+        }
+
+        public void CheckTotalBallastContent()
+        {
+            // Need to find the weight difference for start and end level
+            double tankFromWeightDiff = CalculateWeightDifference(allTankLevels[0].TankFrom, allTankLevels[0].TankFromStartLevel, allTankLevels[0].TankFromEndLevel);
+            double tankToWeightDiff = CalculateWeightDifference(allTankLevels[0].TankTo, allTankLevels[0].TankToStartLevel, allTankLevels[0].TankToEndLevel);
+
+            // Check if difference is less than 1
+            if ((Math.Abs(tankFromWeightDiff) - Math.Abs(tankToWeightDiff)) < 1)
+            {
+                // Flag warning
+                MessageBox.Show("Difference less than 1.");
+            }
+        }
+
+        // Enters tank file and finds weight for start level and end level.
+        // Then, calculates the difference.
+        private double CalculateWeightDifference(string tankName, double startLevel, double endLevel)
+        {
+            // Add extension to tank name
+            string filename = tankName + ".txt";
+
+            // Enter tank file
+            using (StreamReader stream = new StreamReader(filename))
+            {
+                stream.ReadLine();
+                stream.ReadLine();
+
+                string[] line;
+                string newLevel = "";
+                string oldLevel;
+                string newVolume = "";
+                string oldVolume;
+                do
+                {
+                    oldLevel = newLevel;
+                    oldVolume = newVolume;
+                    line = stream.ReadLine().Split(',');
+                    newLevel = line[0];
+                    newVolume = line[1];
+                } while (Convert.ToDouble(line[0]) < startLevel);
+
+                stream.Close();
+
+                return (Convert.ToDouble(startLevel) - Convert.ToDouble(oldLevel)) * (Convert.ToDouble(newVolume) - Convert.ToDouble(oldVolume)) / (Convert.ToDouble(newLevel) - Convert.ToDouble(oldLevel)) + Convert.ToDouble(oldVolume);
             }
         }
     }
