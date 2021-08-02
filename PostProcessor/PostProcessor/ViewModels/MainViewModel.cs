@@ -341,7 +341,10 @@ namespace PostProcessor.ViewModels
             // Loop through vessel conditions and check displacements
             for (int i = 1; i < vesselConditions.Count; i++)
             {
-                if (Math.Abs((vesselConditions[i].Displacement - vesselConditions[i - 1].Displacement)) > vesselConditions[i].TCP)
+                // Assign difference in displacement and add to list
+                double displacementDiff = Math.Abs((vesselConditions[i].Displacement - vesselConditions[i - 1].Displacement));
+
+                if (displacementDiff > vesselConditions[i].TCP)
                 {
                     // Flag warning
                     //MessageBox.Show($"At shift {i} the difference in displacements is greater than TCP");
@@ -357,8 +360,11 @@ namespace PostProcessor.ViewModels
                 double tankFromWeightDiff = CalculateWeightDifference(tankLevels.TankFrom, tankLevels.TankFromStartLevel, tankLevels.TankFromEndLevel);
                 double tankToWeightDiff = CalculateWeightDifference(tankLevels.TankTo, tankLevels.TankToStartLevel, tankLevels.TankToEndLevel);
 
+                // Assign difference in weights and add to list
+                double tankWeightDiff = Math.Abs(tankFromWeightDiff) - Math.Abs(tankToWeightDiff);
+
                 // Check if difference is less than 1
-                if ((Math.Abs(tankFromWeightDiff) - Math.Abs(tankToWeightDiff)) < 1)
+                if (tankWeightDiff < 1)
                 {
                     // Flag warning
                     MessageBox.Show("Difference less than 1 tonnes.");
