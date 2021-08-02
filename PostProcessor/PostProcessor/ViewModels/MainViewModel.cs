@@ -73,8 +73,11 @@ namespace PostProcessor.ViewModels
                 allDraughts.Add(new Draughts(Convert.ToDouble(draughts[0]), Convert.ToDouble(draughts[1]), Convert.ToDouble(draughts[2]), Convert.ToDouble(draughts[3])));
 
                 string line = reader.ReadLine();
+                // Assign first vessel condition and add to list
                 VesselCondition vesselCondition = new VesselCondition();
                 vesselCondition.Displacement = Convert.ToDouble(line.Split(',')[0]);
+                vesselCondition.TCP = Convert.ToDouble(line.Split(',')[4]);
+                vesselConditions.Add(vesselCondition);
 
                 for (int i = 0; i < 2; i++)
                 {
@@ -417,6 +420,20 @@ namespace PostProcessor.ViewModels
                 stream.Close();
 
                 return (Convert.ToDouble(level) - Convert.ToDouble(oldLevel)) * (Convert.ToDouble(newVolume) - Convert.ToDouble(oldVolume)) / (Convert.ToDouble(newLevel) - Convert.ToDouble(oldLevel)) + Convert.ToDouble(oldVolume);
+            }
+        }
+
+        public void CheckDisplacementChangeEqualsBallastChange()
+        {
+            // Iterate through displacement differences and compare
+            for(int i = 0; i < displacementDiffs.Count; i++)
+            {
+                // Check if difference equals ballast content difference
+                if(displacementDiffs[i] == ballastContentDiffs[i])
+                {
+                    // Flag warning
+                    MessageBox.Show($"At test {i} displacement change ({displacementDiffs[i]}) equals ballast content change ({ballastContentDiffs[i]}).");
+                }
             }
         }
     }
