@@ -35,6 +35,11 @@ namespace PostProcessor.ViewModels
         // Determines whether draughts were read from draught marks or gauges
         bool isDraughtReadFromMarks;
 
+        // Displacement differences per shift
+        List<double> displacementDiffs = new List<double>();
+        // Ballast content differences per shift
+        List<double> ballastContentDiffs = new List<double>();
+
         // Date when mosis test was undetaken
         private string _fileDate;
         public string FileDate
@@ -343,6 +348,7 @@ namespace PostProcessor.ViewModels
             {
                 // Assign difference in displacement and add to list
                 double displacementDiff = Math.Abs((vesselConditions[i].Displacement - vesselConditions[i - 1].Displacement));
+                displacementDiffs.Add(displacementDiff);
 
                 if (displacementDiff > vesselConditions[i].TCP)
                 {
@@ -362,6 +368,7 @@ namespace PostProcessor.ViewModels
 
                 // Assign difference in weights and add to list
                 double tankWeightDiff = Math.Abs(tankFromWeightDiff) - Math.Abs(tankToWeightDiff);
+                ballastContentDiffs.Add(tankWeightDiff);
 
                 // Check if difference is less than 1
                 if (tankWeightDiff < 1)
