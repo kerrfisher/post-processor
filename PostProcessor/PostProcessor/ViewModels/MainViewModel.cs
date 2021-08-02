@@ -351,25 +351,35 @@ namespace PostProcessor.ViewModels
 
         public void CheckTotalBallastContent()
         {
-            // Need to find the weight difference for start and end level
-            double tankFromWeightDiff = CalculateWeightDifference(allTankLevels[0].TankFrom, allTankLevels[0].TankFromStartLevel, allTankLevels[0].TankFromEndLevel);
-            double tankToWeightDiff = CalculateWeightDifference(allTankLevels[0].TankTo, allTankLevels[0].TankToStartLevel, allTankLevels[0].TankToEndLevel);
-
-            // Check if difference is less than 1
-            if ((Math.Abs(tankFromWeightDiff) - Math.Abs(tankToWeightDiff)) < 1)
+            foreach(TankLevels tankLevels in allTankLevels)
             {
-                // Flag warning
-                MessageBox.Show("Difference less than 1.");
+                // Need to find the weight difference for start and end level
+                double tankFromWeightDiff = CalculateWeightDifference(tankLevels.TankFrom, tankLevels.TankFromStartLevel, tankLevels.TankFromEndLevel);
+                double tankToWeightDiff = CalculateWeightDifference(tankLevels.TankTo, tankLevels.TankToStartLevel, tankLevels.TankToEndLevel);
+
+                // Check if difference is less than 1
+                if ((Math.Abs(tankFromWeightDiff) - Math.Abs(tankToWeightDiff)) < 1)
+                {
+                    // Flag warning
+                    MessageBox.Show("Difference less than 1 tonnes.");
+                }
             }
         }
 
         // Enters tank file and finds weight for start level and end level.
         // Then, calculates the difference.
-        private double CalculateWeightDifference(string tankName, double startLevel, double endLevel)
+        private static double CalculateWeightDifference(string tankName, double startLevel, double endLevel)
         {
             // Add extension to tank name
             string filename = tankName + ".txt";
+            double startLevelVol = ExtractVolume(filename, startLevel);
+            double endLevelVol = ExtractVolume(filename, endLevel);
 
+            return endLevelVol - startLevelVol;
+        }
+
+        private static double ExtractVolume(string filename, double level)
+        {
             // Enter tank file
             using (StreamReader stream = new StreamReader(filename))
             {
@@ -381,6 +391,7 @@ namespace PostProcessor.ViewModels
                 string oldLevel;
                 string newVolume = "";
                 string oldVolume;
+
                 do
                 {
                     oldLevel = newLevel;
@@ -388,11 +399,11 @@ namespace PostProcessor.ViewModels
                     line = stream.ReadLine().Split(',');
                     newLevel = line[0];
                     newVolume = line[1];
-                } while (Convert.ToDouble(line[0]) < startLevel);
+                } while (Convert.ToDouble(line[0]) < level);
 
                 stream.Close();
 
-                return (Convert.ToDouble(startLevel) - Convert.ToDouble(oldLevel)) * (Convert.ToDouble(newVolume) - Convert.ToDouble(oldVolume)) / (Convert.ToDouble(newLevel) - Convert.ToDouble(oldLevel)) + Convert.ToDouble(oldVolume);
+                return (Convert.ToDouble(level) - Convert.ToDouble(oldLevel)) * (Convert.ToDouble(newVolume) - Convert.ToDouble(oldVolume)) / (Convert.ToDouble(newLevel) - Convert.ToDouble(oldLevel)) + Convert.ToDouble(oldVolume);
             }
         }
     }
