@@ -64,6 +64,7 @@ namespace PostProcessor
                     mainViewModel.CheckDisplacementChange();
                     mainViewModel.CheckTotalBallastContent();
                     mainViewModel.CheckDisplacementChangeEqualsBallastChange();
+                    mainViewModel.CheckBallastEqualsBallastAdded();
                 }
             }
         }

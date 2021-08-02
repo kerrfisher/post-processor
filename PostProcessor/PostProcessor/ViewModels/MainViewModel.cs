@@ -436,5 +436,15 @@ namespace PostProcessor.ViewModels
                 }
             }
         }
+
+        public void CheckBallastEqualsBallastAdded()
+        {
+            foreach(double difference in ballastContentDiffs)
+            {
+                // If difference does not equal zero, flag warning
+                if (difference != 0)
+                    MessageBox.Show("The ballast removed from the tank does not equal the ballast added to the tank");
+            }
+        }
     }
 }
