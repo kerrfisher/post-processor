@@ -466,5 +466,7 @@ namespace PostProcessor.ViewModels
                     MessageBox.Show("The ballast removed from the tank does not equal the ballast added to the tank");
             }
         }
+
+        // Eventually, a method will be needed to write the calculations and checks to a txt file
     }
 }

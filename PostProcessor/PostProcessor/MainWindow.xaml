@@ -19,21 +19,13 @@
             <Label x:Name="lblDate" Content="{Binding FileDate}"/>
         </StackPanel>
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" Margin="10">
+            <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <StackPanel Grid.Row="0" HorizontalAlignment="Left">
-                    <Label x:Name="lblVesselName" Content="Paul B Lloyd Jr."/>
-                </StackPanel>
 
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -96,27 +88,6 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-            </Grid>
-            
-            <Grid Grid.Column="1" Margin="10">
-                <StackPanel Orientation="Vertical" Margin="10">
-                    <Label Content="Consistency of heel and trim measurements for all inclinings"/>
-                    <CheckBox/>
-                    <Label Content="Verify unexpected change of trim"/>
-                    <Label/>
-                    <Label Content="Verify unexpected change of heel"/>
-                    <Label/>
-                    <Label Content="Consistency of draughts"/>
-                    <Label/>
-                    <Label Content="Check displacement charge"/>
-                    <Label/>
-                    <Label Content="Check change of total ballast content in the tanks used to incline"/>
-                    <Label/>
-                    <Label Content="Check any displacement change equalise ballast change"/>
-                    <Label/>
-                    <Label Content="Check ballast removed from tank A equal ballast added to tank B"/>
-                    <Label/>
-                </StackPanel>
             </Grid>
         </Grid>
     </Grid>
