@@ -239,7 +239,27 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void CheckConsistencies()
+        public void AnalyseContents()
+        {
+            // Consistency of heel and trim measurements for all inclinings
+            CheckConsistencies();
+            // Verify unexpected change of trim given tank A and tank B
+            VerifyUnexpectedChangeTrim();
+            // Verify unexpected change of trim given tank A and tank B
+            VerifyUnexpectedChangeHeel();
+            // Consistency of draught input
+            CheckDraughtConsistency();
+            // Check displacement change
+            CheckDisplacementChange();
+            // Check change of total ballast content in the tanks used to incline
+            CheckTotalBallastContent();
+            // Check that any displacement change equals the ballast change
+            CheckDisplacementChangeEqualsBallastChange();
+            // Check ballast removed from tank A equal ballast added to tank B
+            CheckBallastEqualsBallastAdded();
+        }
+
+        private void CheckConsistencies()
         {
             List<bool> motions = new List<bool>();
 
@@ -259,7 +279,7 @@ namespace PostProcessor.ViewModels
             return a * Math.Pow(10, 1);
         }
 
-        public void VerifyUnexpectedChangeTrim()
+        private void VerifyUnexpectedChangeTrim()
         {
             int numOfRecords = TankFromData.Count;
 
@@ -288,7 +308,7 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void VerifyUnexpectedChangeHeel()
+        private void VerifyUnexpectedChangeHeel()
         {
             int numOfRecords = TankFromData.Count;
 
@@ -317,7 +337,7 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void CheckDraughtConsistency()
+        private void CheckDraughtConsistency()
         {
             SemisubDraught semisubDraught = new SemisubDraught();
             // Set the coordinates to be used when computing the plane
@@ -344,7 +364,7 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void CheckDisplacementChange()
+        private void CheckDisplacementChange()
         {
             // Loop through vessel conditions and check displacements
             for (int i = 1; i < vesselConditions.Count; i++)
@@ -361,7 +381,7 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void CheckTotalBallastContent()
+        private void CheckTotalBallastContent()
         {
             foreach(TankLevels tankLevels in allTankLevels)
             {
@@ -423,7 +443,7 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void CheckDisplacementChangeEqualsBallastChange()
+        private void CheckDisplacementChangeEqualsBallastChange()
         {
             // Iterate through displacement differences and compare
             for(int i = 0; i < displacementDiffs.Count; i++)
@@ -437,7 +457,7 @@ namespace PostProcessor.ViewModels
             }
         }
 
-        public void CheckBallastEqualsBallastAdded()
+        private void CheckBallastEqualsBallastAdded()
         {
             foreach(double difference in ballastContentDiffs)
             {
